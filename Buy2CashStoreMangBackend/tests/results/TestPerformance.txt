@@ -1,0 +1,39 @@
+PS Y:\Buy2Cash\storeMang\Buy2CashStoreMang\tests> python run_all_tests.py
+>> 
+Running all tests (excluding load tests)...
+C:\Users\vinee\AppData\Local\Programs\Python\Python312\Lib\site-packages\dash\dash.py:22: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import get_distribution, parse_version
+========================= test session starts ==========================
+platform win32 -- Python 3.12.3, pytest-8.4.1, pluggy-1.6.0 -- C:\Users\vinee\AppData\Local\Programs\Python\Python312\python.exe
+cachedir: .pytest_cache
+rootdir: Y:\Buy2Cash\storeMang\Buy2CashStoreMang\tests
+plugins: anyio-3.7.1, dash-2.9.3, Faker-25.9.2, asyncio-1.1.0
+asyncio: mode=Mode.STRICT, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 15 items                                                      
+
+integration_test.py::test_store_workflow PASSED                   [  6%]
+regression_test.py::test_regression_queries PASSED                [ 13%]
+system_test.py::test_user_journey PASSED                          [ 20%]
+unit_test.py::test_health_check PASSED                            [ 26%]
+unit_test.py::test_get_stores PASSED                              [ 33%]
+unit_test.py::test_top_selling_products PASSED                    [ 40%]
+unit_test.py::test_popular_searches PASSED                        [ 46%]
+unit_test.py::test_top_selling_categories PASSED                  [ 53%]
+unit_test.py::test_unsold_products PASSED                         [ 60%]
+unit_test.py::test_store_performance PASSED                       [ 66%]
+unit_test.py::test_query_endpoint PASSED                          [ 73%]
+unit_test.py::test_sessions PASSED                                [ 80%]
+unit_test.py::test_session_by_id PASSED                           [ 86%]
+unit_test.py::test_product_substitutions PASSED                   [ 93%]
+unit_test.py::test_discount_recommendations PASSED                [100%]
+
+=========================== warnings summary =========================== 
+C:\Users\vinee\AppData\Local\Programs\Python\Python312\Lib\site-packages\locust\__init__.py:16
+  C:\Users\vinee\AppData\Local\Programs\Python\Python312\Lib\site-packages\locust\__init__.py:16: MonkeyPatchWarning: Monkey-patching ssl after ssl has already been imported may lead to errors, including RecursionError on Python 3.6. It may also silently lead to incorrect behaviour on Python 3.7. Please monkey-patch earlier. See https://github.com/gevent/gevent/issues/1016. Modules that had direct imports (NOT patched): ['urllib3.util (C:\\Users\\vinee\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\urllib3\\util\\__init__.py)', 'urllib3.util.ssl_ (C:\\Users\\vinee\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\urllib3\\util\\ssl_.py)'].
+    monkey.patch_all()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html  
+- generated xml file: Y:\Buy2Cash\storeMang\Buy2CashStoreMang\tests\results\report.xml -
+=============== 15 passed, 1 warning in 92.45s (0:01:32) =============== 
+Tests finished. Reports saved in: Y:\Buy2Cash\storeMang\Buy2CashStoreMang\tests\results
+PS Y:\Buy2Cash\storeMang\Buy2CashStoreMang\tests> 
