@@ -6,7 +6,7 @@ import redis
 
 logger = logging.getLogger(__name__)
 
-load_dotenv("Buy2CashStoreMang/config.env")
+load_dotenv("Buy2CashStoreMangBackend/config.env")
 # MongoDB Configuration
 
 MONGODB_URI = os.getenv("MONGODB_URI")

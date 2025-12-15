@@ -1,8 +1,7 @@
 
 'use client';
 import React, { useState, useEffect } from 'react';
-import { BarChart3, Package, Users, ShoppingCart, TrendingUp, Bell, Search, ChevronDown } from 'lucide-react';
-
+import { BarChart3, Package, Users, ShoppingCart, TrendingUp, Bell, Search, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
 // Store ID constant
 const STORE_ID = "68d11731a79f004f440c31a2";
 const API_BASE = "http://localhost:8000";
@@ -151,6 +150,8 @@ export default function Buy2CashDashboard() {
   const [recentOrders, setRecentOrders] = useState([]);
   const [ordersLoading, setOrdersLoading] = useState(true);
   const [ordersPagination, setOrdersPagination] = useState(null);
+  const [ordersPerPage, setOrdersPerPage] = useState(5); // Start with 5
+  const [currentPage, setCurrentPage] = useState(1);  
 
   // Dish Query Data State
   const [dishQueryData, setDishQueryData] = useState([]);
@@ -164,6 +165,9 @@ export default function Buy2CashDashboard() {
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
   const [showDatePicker, setShowDatePicker] = useState(false);
+
+
+  //
 
   // Fetch all KPI data
   useEffect(() => {
@@ -279,8 +283,8 @@ export default function Buy2CashDashboard() {
         
         // Build query parameters based on filters
         const queryParams = {
-          page: 1,
-          limit: 10
+          page: currentPage,
+          limit: ordersPerPage
         };
         
         // Add status filter if not "all"
@@ -307,7 +311,7 @@ export default function Buy2CashDashboard() {
     };
 
     fetchOrders();
-  }, [filterStatus, searchText]);
+  }, [filterStatus, searchText, currentPage, ordersPerPage]);
 
   // Fetch Top Dish Searches
   useEffect(() => {
@@ -386,7 +390,21 @@ export default function Buy2CashDashboard() {
 
     return chartData;
   };
+  // NEW: Handle "Show More" button
+  const handleShowMore = () => {
+    setOrdersPerPage(10);
+    setCurrentPage(1); // Reset to first page when expanding
+  };
 
+  // NEW: Handle page navigation
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+    window.scrollTo({ top: document.getElementById('recent-orders-section')?.offsetTop - 100, behavior: 'smooth' });
+  };
+
+  // NEW: Calculate total pages
+  const totalPages = ordersPagination ? Math.ceil(ordersPagination.total_items / ordersPerPage) : 1;
+  
   const chartData = getChartData();
   const maxRevenue = Math.max(...chartData.map(d => d.revenue), 1);
 
@@ -1134,12 +1152,12 @@ export default function Buy2CashDashboard() {
               </div>
             </div>
 
-            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+            <div id="recent-orders-section" className="bg-white rounded-lg border border-gray-200 overflow-hidden">
               <div className="px-6 py-4 border-b border-gray-200">
-                <h3 className="font-semibold text-black ">Recent Orders - Detailed View</h3>
+                <h3 className="font-semibold text-black">Recent Orders - Detailed View</h3>
                 {ordersPagination && (
                   <p className="text-xs text-gray-500 mt-1">
-                    Showing {recentOrders.length} of {ordersPagination.total_items} orders
+                    Showing {((currentPage - 1) * ordersPerPage) + 1} - {Math.min(currentPage * ordersPerPage, ordersPagination.total_items)} of {ordersPagination.total_items} orders
                   </p>
                 )}
               </div>
@@ -1152,49 +1170,125 @@ export default function Buy2CashDashboard() {
                   No orders found
                 </div>
               ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead className="bg-gray-50 border-b border-gray-200">
-                      <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Order ID</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Customer</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date & Time</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Items</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Payment</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Category</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-200">
-                      {recentOrders.map((order) => (
-                        <tr key={order.order_id} className="hover:bg-gray-50">
-                          <td className="px-6 py-4 text-sm text-gray-900">{order.order_id}</td>
-                          <td className="px-6 py-4">
-                            <div className="text-sm text-gray-900">{order.customer.name}</div>
-                            <div className="text-xs text-gray-500">{order.customer.phone}</div>
-                          </td>
-                          <td className="px-6 py-4 text-sm text-gray-500">
-                            {formatDateTime(order.date_time.created)}
-                          </td>
-                          <td className="px-6 py-4 text-sm text-gray-900">{order.items_count}</td>
-                          <td className="px-6 py-4 text-sm text-gray-900">₹{order.amount.total}</td>
-                          <td className="px-6 py-4 text-sm">
-                            <span className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(order.status)}`}>
-                              {formatStatus(order.status)}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 text-sm text-gray-500">
-                            {order.payment_method === 'ONLINE' ? 'Online' : 'COD'}
-                          </td>
-                          <td className="px-6 py-4 text-sm text-gray-500">
-                            {order.category === 'CUSTOMER_APP' ? 'Customer App' : order.category}
-                          </td>
+                <>
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead className="bg-gray-50 border-b border-gray-200">
+                        <tr>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Order ID</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Customer</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date & Time</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Items</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Payment</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Category</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                      </thead>
+                      <tbody className="divide-y divide-gray-200">
+                        {recentOrders.map((order) => (
+                          <tr key={order.order_id} className="hover:bg-gray-50">
+                            <td className="px-6 py-4 text-sm text-gray-900">{order.order_id}</td>
+                            <td className="px-6 py-4">
+                              <div className="text-sm text-gray-900">{order.customer.name}</div>
+                              <div className="text-xs text-gray-500">{order.customer.phone}</div>
+                            </td>
+                            <td className="px-6 py-4 text-sm text-gray-500">
+                              {formatDateTime(order.date_time.created)}
+                            </td>
+                            <td className="px-6 py-4 text-sm text-gray-900">{order.items_count}</td>
+                            <td className="px-6 py-4 text-sm text-gray-900">₹{order.amount.total}</td>
+                            <td className="px-6 py-4 text-sm">
+                              <span className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(order.status)}`}>
+                                {formatStatus(order.status)}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4 text-sm text-gray-500">
+                              {order.payment_method === 'ONLINE' ? 'Online' : 'COD'}
+                            </td>
+                            <td className="px-6 py-4 text-sm text-gray-500">
+                              {order.category === 'CUSTOMER_APP' ? 'Customer App' : order.category}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  
+                  {/* NEW: Show More Button and Pagination Controls */}
+                  <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
+                    {ordersPerPage === 5 && ordersPagination && ordersPagination.total_items > 5 && (
+                      <div className="flex justify-center mb-4">
+                        <button
+                          onClick={handleShowMore}
+                          className="px-6 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors"
+                        >
+                          Show More
+                        </button>
+                      </div>
+                    )}
+                    
+                    {ordersPerPage === 10 && totalPages > 1 && (
+                      <div className="flex items-center justify-between">
+                        <div className="text-sm text-gray-600">
+                          Page {currentPage} of {totalPages}
+                        </div>
+                        
+                        <div className="flex items-center space-x-2">
+                          <button
+                            onClick={() => handlePageChange(currentPage - 1)}
+                            disabled={currentPage === 1}
+                            className="p-2 rounded-lg border border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                          >
+                            <ChevronLeft className="w-4 h-4 text-gray-600" />
+                          </button>
+                          
+                          {[...Array(totalPages)].map((_, idx) => {
+                            const pageNum = idx + 1;
+                            // Show first page, last page, current page, and pages around current
+                            if (
+                              pageNum === 1 ||
+                              pageNum === totalPages ||
+                              (pageNum >= currentPage - 1 && pageNum <= currentPage + 1)
+                            ) {
+                              return (
+                                <button
+                                  key={pageNum}
+                                  onClick={() => handlePageChange(pageNum)}
+                                  className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
+                                    currentPage === pageNum
+                                      ? 'bg-indigo-600 text-white'
+                                      : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-100'
+                                  }`}
+                                >
+                                  {pageNum}
+                                </button>
+                              );
+                            } else if (
+                              pageNum === currentPage - 2 ||
+                              pageNum === currentPage + 2
+                            ) {
+                              return <span key={pageNum} className="text-gray-400">...</span>;
+                            }
+                            return null;
+                          })}
+                          
+                          <button
+                            onClick={() => handlePageChange(currentPage + 1)}
+                            disabled={currentPage === totalPages}
+                            className="p-2 rounded-lg border border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                          >
+                            <ChevronRight className="w-4 h-4 text-gray-600" />
+                          </button>
+                        </div>
+                        
+                        <div className="text-sm text-gray-600">
+                          {ordersPagination.total_items} total orders
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </>
               )}
             </div>
           </div>
@@ -1228,7 +1322,7 @@ export default function Buy2CashDashboard() {
                         </div>
                       </div>
                       <div className="flex items-center space-x-3">
-                        <span className="font-semibold text-sm">{dish.searches.toLocaleString()}</span>
+                        <span className="font-semibold text-sm text-black">{dish.searches.toLocaleString()}</span>
                       </div>
                     </div>
                   ))}

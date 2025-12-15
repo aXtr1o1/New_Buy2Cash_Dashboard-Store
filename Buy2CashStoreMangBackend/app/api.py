@@ -600,12 +600,12 @@ from fastapi import HTTPException
 def get_recent_orders(
     store_id: str,
     page: int = 1,
-    limit: int = 10,
+    limit: int = None,
     status: str = None,
     order_type: str = None,
     date_from: str = None,
     date_to: str = None,
-    search: str = None  # 🆕 NEW SEARCH PARAMETER
+    search: str = None 
 ):
     try:
         store_obj_id = ObjectId(store_id)
