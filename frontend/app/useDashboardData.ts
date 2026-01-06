@@ -437,8 +437,6 @@ export const useDashboardData = () => {
     // Actions
     generateTopProducts,
     generateAIInsights,
-    generateSubstitutionInsights,
-    toggleInsightExpanded,
     handleShowMore,
     handlePageChange,
     handleClearDates,
