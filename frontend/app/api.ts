@@ -1,47 +1,58 @@
 // api.ts - API Functions and Utilities
 
 const STORE_ID = "68d11731a79f004f440c31a2";
-const API_BASE = "http://localhost:8000";
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8000";
+
+// Helper function to build query params
+const buildQueryParams = (params: Record<string, any>): URLSearchParams => {
+  const queryParams = new URLSearchParams();
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== null && value !== undefined && value !== '') {
+      queryParams.append(key, String(value));
+    }
+  });
+  return queryParams;
+};
 
 // API Functions
 export async function fetchTotalProducts(storeId: string, params = {}) {
-  const queryParams = new URLSearchParams(Object.entries(params).filter(([_, v]) => v));
+  const queryParams = buildQueryParams(params);
   const res = await fetch(`${API_BASE}/api/analytics/total-products/${storeId}?${queryParams}`);
   return res.json();
 }
 
 export async function fetchTotalSales(storeId: string, params = {}) {
-  const queryParams = new URLSearchParams(Object.entries(params).filter(([_, v]) => v));
+  const queryParams = buildQueryParams(params);
   const res = await fetch(`${API_BASE}/api/analytics/total-sales/${storeId}?${queryParams}`);
   return res.json();
 }
 
 export async function fetchTotalRevenue(storeId: string, params = {}) {
-  const queryParams = new URLSearchParams(Object.entries(params).filter(([_, v]) => v));
+  const queryParams = buildQueryParams(params);
   const res = await fetch(`${API_BASE}/api/analytics/total-revenue/${storeId}?${queryParams}`);
   return res.json();
 }
 
 export async function fetchAvgOrderValue(storeId: string, params = {}) {
-  const queryParams = new URLSearchParams(Object.entries(params).filter(([_, v]) => v));
+  const queryParams = buildQueryParams(params);
   const res = await fetch(`${API_BASE}/api/analytics/avg-order-value/${storeId}?${queryParams}`);
   return res.json();
 }
 
 export async function fetchTotalCustomers(storeId: string, params = {}) {
-  const queryParams = new URLSearchParams(Object.entries(params).filter(([_, v]) => v));
+  const queryParams = buildQueryParams(params);
   const res = await fetch(`${API_BASE}/api/analytics/total-customers/${storeId}?${queryParams}`);
   return res.json();
 }
 
 export async function fetchUniqueCustomers(storeId: string, params = {}) {
-  const queryParams = new URLSearchParams(Object.entries(params).filter(([_, v]) => v));
+  const queryParams = buildQueryParams(params);
   const res = await fetch(`${API_BASE}/api/analytics/unique-customers/${storeId}?${queryParams}`);
   return res.json();
 }
 
 export async function fetchTopCustomers(storeId: string, params = {}) {
-  const queryParams = new URLSearchParams(Object.entries(params).filter(([_, v]) => v));
+  const queryParams = buildQueryParams(params);
   const res = await fetch(`${API_BASE}/api/analytics/top-customers/${storeId}?${queryParams}`);
   return res.json();
 }
@@ -57,19 +68,19 @@ export async function fetchQuickAnalysis(storeId: string) {
 }
 
 export async function fetchMonthlyRevenue(storeId: string, params = {}) {
-  const queryParams = new URLSearchParams(Object.entries(params).filter(([_, v]) => v));
+  const queryParams = buildQueryParams(params);
   const res = await fetch(`${API_BASE}/api/analytics/monthly-revenue/${storeId}?${queryParams}`);
   return res.json();
 }
 
 export async function fetchProductsByCategory(storeId: string, params = {}) {
-  const queryParams = new URLSearchParams(Object.entries(params).filter(([_, v]) => v));
+  const queryParams = buildQueryParams(params);
   const res = await fetch(`${API_BASE}/api/analytics/products-by-category/${storeId}?${queryParams}`);
   return res.json();
 }
 
 export async function fetchRecentOrders(storeId: string, query = {}) {
-  const params = new URLSearchParams(Object.entries(query).filter(([_, v]) => v));
+  const params = buildQueryParams(query);
   const res = await fetch(`${API_BASE}/api/analytics/recent-orders/${storeId}?${params}`);
   return res.json();
 }
@@ -80,7 +91,7 @@ export async function fetchTopDishSearches(storeId: string) {
 }
 
 export async function fetchTopSellingProducts(storeId: string, params = {}) {
-  const queryParams = new URLSearchParams(Object.entries(params).filter(([_, v]) => v));
+  const queryParams = buildQueryParams(params);
   const res = await fetch(`${API_BASE}/api/analytics/top-selling-products/${storeId}?${queryParams}`);
   return res.json();
 }
