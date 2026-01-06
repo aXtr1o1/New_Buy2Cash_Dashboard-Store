@@ -1,2 +1,0 @@
-Exit Code: 0
-Check report.xml for full test results.

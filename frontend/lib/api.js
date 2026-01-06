@@ -52,51 +52,55 @@ export async function fetchStorePerformance(storeId, period = 30) {
 // ─────────────────────────────────────────
 
 // total products
-export async function fetchTotalProducts(storeId) {
+export async function fetchTotalProducts(storeId, params = {}) {
+  const queryParams = new URLSearchParams(Object.entries(params).filter(([_, v]) => v));
   const res = await fetch(
-    `${API_BASE}/api/analytics/total-products/${storeId}`
+    `${API_BASE}/api/analytics/total-products/${storeId}?${queryParams}`
   );
   return res.json();
 }
 
-// return 
-
 // total completed orders (sales count)
-export async function fetchTotalSales(storeId) {
+export async function fetchTotalSales(storeId, params = {}) {
+  const queryParams = new URLSearchParams(Object.entries(params).filter(([_, v]) => v));
   const res = await fetch(
-    `${API_BASE}/api/analytics/total-sales/${storeId}`
+    `${API_BASE}/api/analytics/total-sales/${storeId}?${queryParams}`
   );
   return res.json();
 }
 
 // total revenue (sum of `total`)
-export async function fetchTotalRevenue(storeId) {
+export async function fetchTotalRevenue(storeId, params = {}) {
+  const queryParams = new URLSearchParams(Object.entries(params).filter(([_, v]) => v));
   const res = await fetch(
-    `${API_BASE}/api/analytics/total-revenue/${storeId}`
+    `${API_BASE}/api/analytics/total-revenue/${storeId}?${queryParams}`
   );
   return res.json();
 }
 
 // monthly revenue aggregation
-export async function fetchMonthlyRevenue(storeId) {
+export async function fetchMonthlyRevenue(storeId, params = {}) {
+  const queryParams = new URLSearchParams(Object.entries(params).filter(([_, v]) => v));
   const res = await fetch(
-    `${API_BASE}/api/analytics/monthly-revenue/${storeId}`
+    `${API_BASE}/api/analytics/monthly-revenue/${storeId}?${queryParams}`
   );
   return res.json();
 }
 
 // total customers (currently = completed orders count)
-export async function fetchTotalCustomers(storeId) {
+export async function fetchTotalCustomers(storeId, params = {}) {
+  const queryParams = new URLSearchParams(Object.entries(params).filter(([_, v]) => v));
   const res = await fetch(
-    `${API_BASE}/api/analytics/total-customers/${storeId}`
+    `${API_BASE}/api/analytics/total-customers/${storeId}?${queryParams}`
   );
   return res.json();
 }
 
 // unique customers (based on customer.id)
-export async function fetchUniqueCustomers(storeId) {
+export async function fetchUniqueCustomers(storeId, params = {}) {
+  const queryParams = new URLSearchParams(Object.entries(params).filter(([_, v]) => v));
   const res = await fetch(
-    `${API_BASE}/api/analytics/unique-customers/${storeId}`
+    `${API_BASE}/api/analytics/unique-customers/${storeId}?${queryParams}`
   );
   return res.json();
 }
@@ -110,28 +114,10 @@ export async function fetchSalesByTimePeriod(storeId) {
 }
 
 // recent orders with filters + pagination
-export async function fetchRecentOrders(
-  storeId,
-  {
-    page = 1,
-    limit = 10,
-    status = null,
-    orderType = null,
-    dateFrom = null,
-    dateTo = null,
-  } = {}
-) {
-  const params = new URLSearchParams();
-  params.set("page", String(page));
-  params.set("limit", String(limit));
-
-  if (status) params.set("status", status);
-  if (orderType) params.set("order_type", orderType);
-  if (dateFrom) params.set("date_from", dateFrom); // ISO string expected
-  if (dateTo) params.set("date_to", dateTo);       // ISO string expected
-
+export async function fetchRecentOrders(storeId, query = {}) {
+  const params = new URLSearchParams(Object.entries(query).filter(([_, v]) => v));
   const res = await fetch(
-    `${API_BASE}/api/analytics/recent-orders/${storeId}?${params.toString()}`
+    `${API_BASE}/api/analytics/recent-orders/${storeId}?${params}`
   );
   return res.json();
 }
@@ -148,6 +134,33 @@ export async function fetchTopDishSearches(storeId) {
 export async function fetchTopStockAlerts(storeId) {
   const res = await fetch(
     `${API_BASE}/api/analytics/top-stock-alerts/${storeId}`
+  );
+  return res.json();
+}
+
+// Average order value
+export async function fetchAvgOrderValue(storeId, params = {}) {
+  const queryParams = new URLSearchParams(Object.entries(params).filter(([_, v]) => v));
+  const res = await fetch(
+    `${API_BASE}/api/analytics/avg-order-value/${storeId}?${queryParams}`
+  );
+  return res.json();
+}
+
+// Products by category
+export async function fetchProductsByCategory(storeId, params = {}) {
+  const queryParams = new URLSearchParams(Object.entries(params).filter(([_, v]) => v));
+  const res = await fetch(
+    `${API_BASE}/api/analytics/products-by-category/${storeId}?${queryParams}`
+  );
+  return res.json();
+}
+
+// Top selling products
+export async function fetchTopSellingProducts(storeId, params = {}) {
+  const queryParams = new URLSearchParams(Object.entries(params).filter(([_, v]) => v));
+  const res = await fetch(
+    `${API_BASE}/api/analytics/top-selling-products/${storeId}?${queryParams}`
   );
   return res.json();
 }
