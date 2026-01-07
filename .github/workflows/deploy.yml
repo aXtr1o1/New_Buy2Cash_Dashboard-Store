@@ -19,9 +19,9 @@ jobs:
       - name: 🚀 Deploy to E2E Server
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{ secrets.E2E_HOST }}
-          username: ${{ secrets.E2E_USERNAME }}
-          key: ${{ secrets.E2E_SSH_KEY }}
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
           port: 22
           script: |
             set -e
