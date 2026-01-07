@@ -38,19 +38,7 @@ jobs:
             source venv/bin/activate
             pip install --upgrade pip
             pip install -r requirements.txt
-
-            # Restart the service (with fallback if service doesn't exist)
-            if systemctl is-active --quiet buy2cash-api; then
-              echo "🔄 Restarting systemd service..."
-              systemctl restart buy2cash-api
-            else
-              echo "⚠️  Systemd service not found, using manual deployment..."
-              # Kill existing process if running
-              pkill -f "uvicorn main:app" || true
-              sleep 2
-              # Start in background
-              nohup uvicorn main:app --host 0.0.0.0 --port 8000 --workers 4 > app.log 2>&1 &
-            fi
+            uvicorn main:app --host 0.0.0.0 --port 8000
 
             echo "✅ Backend deployed successfully"
             echo "📊 Checking service status..."
