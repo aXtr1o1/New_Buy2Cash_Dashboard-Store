@@ -40,9 +40,9 @@ jobs:
             pip install -r requirements.txt
 
             # Restart the service (with fallback if service doesn't exist)
-            if sudo systemctl is-active --quiet buy2cash-api; then
+            if systemctl is-active --quiet buy2cash-api; then
               echo "🔄 Restarting systemd service..."
-              sudo systemctl restart buy2cash-api
+              systemctl restart buy2cash-api
             else
               echo "⚠️  Systemd service not found, using manual deployment..."
               # Kill existing process if running
