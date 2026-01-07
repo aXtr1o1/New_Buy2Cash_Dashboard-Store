@@ -6,7 +6,7 @@ from pymongo import MongoClient
 
 logger = logging.getLogger(__name__)
 
-load_dotenv("backend/.env")
+load_dotenv(".env")
 
 
 MONGODB_URI = os.getenv("MONGODB_URI")
