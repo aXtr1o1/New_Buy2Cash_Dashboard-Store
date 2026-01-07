@@ -39,14 +39,42 @@ jobs:
             pip install --upgrade pip
             pip install -r requirements.txt
 
-            # Stop existing process if running
-            pkill -f "uvicorn main:app" || true
-            sleep 2
+            # Install Node.js if not installed (required for PM2)
+            if ! command -v node &> /dev/null; then
+              echo "📦 Installing Node.js..."
+              curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+              sudo apt-get install -y nodejs
+            fi
 
-            # Start the application in background
-            nohup uvicorn main:app --host 0.0.0.0 --port 8000 --workers 4 > app.log 2>&1 &
+            # Install PM2 if not already installed
+            if ! command -v pm2 &> /dev/null; then
+              echo "📦 Installing PM2..."
+              sudo npm install -g pm2
+            fi
+
+            # Create logs directory if it doesn't exist
+            mkdir -p logs
+
+            # Stop existing PM2 process if running
+            pm2 stop buy2cash-api || true
+            pm2 delete buy2cash-api || true
+
+            # Start the application with PM2
+            pm2 start ecosystem.config.js
+
 
             echo "✅ Backend deployed successfully"
             echo "📊 Checking service status..."
             sleep 5
-            curl -f http://localhost:8000/docs > /dev/null 2>&1 && echo "✅ API is responding" || echo "⚠️  API health check failed"
+            
+            # Check PM2 status
+            pm2 status
+            
+            # Health check
+            if curl -f http://localhost:8000/docs > /dev/null 2>&1; then
+              echo "✅ API is responding"
+            else
+              echo "⚠️  API health check failed - checking PM2 logs..."
+              pm2 logs buy2cash-api --lines 20 --nostream
+              exit 1
+            fi

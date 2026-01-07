@@ -4,7 +4,7 @@ module.exports = {
     name: 'buy2cash-api',
     script: 'venv/bin/uvicorn',
     args: 'main:app --host 0.0.0.0 --port 8000 --workers 4',
-    cwd: '/opt/buy2cash/backend',
+    cwd: '/opt/buy2cash/New_Buy2Cash_Dashboard-Store/backend',
     instances: 1,
     autorestart: true,
     watch: false,

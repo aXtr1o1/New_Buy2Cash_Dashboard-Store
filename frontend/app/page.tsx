@@ -716,16 +716,16 @@ export default function Buy2CashDashboard() {
                       </div>
                       
                       {hoveredSegment !== null && (
-                        <div 
+                      <div 
                           className="absolute bg-white rounded-lg shadow-xl border-2 border-indigo-500 p-3 pointer-events-none z-20"
-                          style={{
+                        style={{
                             left: `${tooltipPos.x + 10}px`,
                             top: `${tooltipPos.y - 5}px`,
-                            minWidth: '180px',
+                          minWidth: '180px',
                             transform: 'translateY(-100%)',
                             transition: 'left 0.1s ease-out, top 0.1s ease-out'
-                          }}
-                        >
+                        }}
+                      >
                           <div className="text-left">
                             <div className="text-sm font-semibold text-gray-900 mb-1">
                               {donutSegments[hoveredSegment].category}
@@ -739,9 +739,9 @@ export default function Buy2CashDashboard() {
                             <div className="text-xs text-gray-500">
                               ₹{donutSegments[hoveredSegment].value.toLocaleString()} value
                             </div>
+                            </div>
                           </div>
-                        </div>
-                      )}
+                        )}
                     </div>
                     <div className="flex flex-wrap gap-4 justify-center mt-4">
                       {donutSegments.map((segment: any, idx: number) => (
