@@ -1,22 +1,20 @@
 from fastapi import FastAPI
-
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
+import os
+from dotenv import load_dotenv
 
 from api import router
 
+load_dotenv()
 
 app = FastAPI(title="Buy2Cash API")
 
 # CORS configuration so the Next.js frontend can call this API from the browser
-origins = [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+     allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
