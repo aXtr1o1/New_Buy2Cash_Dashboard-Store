@@ -38,9 +38,15 @@ jobs:
             source venv/bin/activate
             pip install --upgrade pip
             pip install -r requirements.txt
-            uvicorn main:app --host 0.0.0.0 --port 8000
+
+            # Stop existing process if running
+            pkill -f "uvicorn main:app" || true
+            sleep 2
+
+            # Start the application in background
+            nohup uvicorn main:app --host 0.0.0.0 --port 8000 --workers 4 > app.log 2>&1 &
 
             echo "✅ Backend deployed successfully"
             echo "📊 Checking service status..."
-            sleep 3
+            sleep 5
             curl -f http://localhost:8000/docs > /dev/null 2>&1 && echo "✅ API is responding" || echo "⚠️  API health check failed"
