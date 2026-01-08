@@ -1166,7 +1166,7 @@ export default function Buy2CashDashboard() {
           </div>
           
           {/* Detailed Dish Query Analytics Table */}
-          <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+          {/* <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
             <div className="px-6 py-4 border-b border-gray-200">
               <h3 className="font-semibold text-black">Detailed Dish Query Analytics</h3>
             </div>
@@ -1231,7 +1231,7 @@ export default function Buy2CashDashboard() {
                 </table>
               </div>
             )}
-          </div>
+          </div> */}
         </main>
       </div>
     </div>
