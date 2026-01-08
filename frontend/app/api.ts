@@ -17,19 +17,15 @@ const buildQueryParams = (params: Record<string, any>): URLSearchParams => {
 // API Functions
 export async function fetchTotalProducts(storeId: string, params = {}) {
   const queryParams = buildQueryParams(params);
-  const res = await fetch(
-    `${API_BASE}/api/analytics/total-products/${storeId}?${queryParams}`,
-    {
-      headers: {
-        "ngrok-skip-browser-warning": "true",
-      },
-    }
-  );
+  const url =
+    `${API_BASE}/api/analytics/total-products/${storeId}` +
+    `?${queryParams}&ngrok-skip-browser-warning=true`;
 
-  const contentType = res.headers.get("content-type") || "";
-  if (!contentType.includes("application/json")) {
-    const text = await res.text();
-    throw new Error("Expected JSON, got:\n" + text.slice(0, 200));
+  const res = await fetch(url);
+
+  const ct = res.headers.get("content-type") || "";
+  if (!ct.includes("application/json")) {
+    throw new Error(await res.text());
   }
 
   return res.json();
@@ -37,19 +33,15 @@ export async function fetchTotalProducts(storeId: string, params = {}) {
 
 export async function fetchTotalSales(storeId: string, params = {}) {
   const queryParams = buildQueryParams(params);
-  const res = await fetch(
-    `${API_BASE}/api/analytics/total-sales/${storeId}?${queryParams}`,
-    {
-      headers: {
-        "ngrok-skip-browser-warning": "true",
-      },
-    }
-  );
+  const url =
+    `${API_BASE}/api/analytics/total-sales/${storeId}` +
+    `?${queryParams}&ngrok-skip-browser-warning=true`;
 
-  const contentType = res.headers.get("content-type") || "";
-  if (!contentType.includes("application/json")) {
-    const text = await res.text();
-    throw new Error("Expected JSON, got:\n" + text.slice(0, 200));
+  const res = await fetch(url);
+
+  const ct = res.headers.get("content-type") || "";
+  if (!ct.includes("application/json")) {
+    throw new Error(await res.text());
   }
 
   return res.json();
@@ -57,19 +49,15 @@ export async function fetchTotalSales(storeId: string, params = {}) {
 
 export async function fetchTotalRevenue(storeId: string, params = {}) {
   const queryParams = buildQueryParams(params);
-  const res = await fetch(
-    `${API_BASE}/api/analytics/total-revenue/${storeId}?${queryParams}`,
-    {
-      headers: {
-        "ngrok-skip-browser-warning": "true",
-      },
-    }
-  );
+  const url =
+    `${API_BASE}/api/analytics/total-revenue/${storeId}` +
+    `?${queryParams}&ngrok-skip-browser-warning=true`;
 
-  const contentType = res.headers.get("content-type") || "";
-  if (!contentType.includes("application/json")) {
-    const text = await res.text();
-    throw new Error("Expected JSON, got:\n" + text.slice(0, 200));
+  const res = await fetch(url);
+
+  const ct = res.headers.get("content-type") || "";
+  if (!ct.includes("application/json")) {
+    throw new Error(await res.text());
   }
 
   return res.json();
@@ -77,19 +65,15 @@ export async function fetchTotalRevenue(storeId: string, params = {}) {
 
 export async function fetchAvgOrderValue(storeId: string, params = {}) {
   const queryParams = buildQueryParams(params);
-  const res = await fetch(
-    `${API_BASE}/api/analytics/avg-order-value/${storeId}?${queryParams}`,
-    {
-      headers: {
-        "ngrok-skip-browser-warning": "true",
-      },
-    }
-  );
+  const url =
+    `${API_BASE}/api/analytics/avg-order-value/${storeId}` +
+    `?${queryParams}&ngrok-skip-browser-warning=true`;
 
-  const contentType = res.headers.get("content-type") || "";
-  if (!contentType.includes("application/json")) {
-    const text = await res.text();
-    throw new Error("Expected JSON, got:\n" + text.slice(0, 200));
+  const res = await fetch(url);
+
+  const ct = res.headers.get("content-type") || "";
+  if (!ct.includes("application/json")) {
+    throw new Error(await res.text());
   }
 
   return res.json();
@@ -97,19 +81,15 @@ export async function fetchAvgOrderValue(storeId: string, params = {}) {
 
 export async function fetchTotalCustomers(storeId: string, params = {}) {
   const queryParams = buildQueryParams(params);
-  const res = await fetch(
-    `${API_BASE}/api/analytics/total-customers/${storeId}?${queryParams}`,
-    {
-      headers: {
-        "ngrok-skip-browser-warning": "true",
-      },
-    }
-  );
+  const url =
+    `${API_BASE}/api/analytics/total-customers/${storeId}` +
+    `?${queryParams}&ngrok-skip-browser-warning=true`;
 
-  const contentType = res.headers.get("content-type") || "";
-  if (!contentType.includes("application/json")) {
-    const text = await res.text();
-    throw new Error("Expected JSON, got:\n" + text.slice(0, 200));
+  const res = await fetch(url);
+
+  const ct = res.headers.get("content-type") || "";
+  if (!ct.includes("application/json")) {
+    throw new Error(await res.text());
   }
 
   return res.json();
@@ -117,19 +97,15 @@ export async function fetchTotalCustomers(storeId: string, params = {}) {
 
 export async function fetchUniqueCustomers(storeId: string, params = {}) {
   const queryParams = buildQueryParams(params);
-  const res = await fetch(
-    `${API_BASE}/api/analytics/unique-customers/${storeId}?${queryParams}`,
-    {
-      headers: {
-        "ngrok-skip-browser-warning": "true",
-      },
-    }
-  );
+  const url =
+    `${API_BASE}/api/analytics/unique-customers/${storeId}` +
+    `?${queryParams}&ngrok-skip-browser-warning=true`;
 
-  const contentType = res.headers.get("content-type") || "";
-  if (!contentType.includes("application/json")) {
-    const text = await res.text();
-    throw new Error("Expected JSON, got:\n" + text.slice(0, 200));
+  const res = await fetch(url);
+
+  const ct = res.headers.get("content-type") || "";
+  if (!ct.includes("application/json")) {
+    throw new Error(await res.text());
   }
 
   return res.json();
@@ -137,57 +113,45 @@ export async function fetchUniqueCustomers(storeId: string, params = {}) {
 
 export async function fetchTopCustomers(storeId: string, params = {}) {
   const queryParams = buildQueryParams(params);
-  const res = await fetch(
-    `${API_BASE}/api/analytics/top-customers/${storeId}?${queryParams}`,
-    {
-      headers: {
-        "ngrok-skip-browser-warning": "true",
-      },
-    }
-  );
+  const url =
+    `${API_BASE}/api/analytics/top-customers/${storeId}` +
+    `?${queryParams}&ngrok-skip-browser-warning=true`;
 
-  const contentType = res.headers.get("content-type") || "";
-  if (!contentType.includes("application/json")) {
-    const text = await res.text();
-    throw new Error("Expected JSON, got:\n" + text.slice(0, 200));
+  const res = await fetch(url);
+
+  const ct = res.headers.get("content-type") || "";
+  if (!ct.includes("application/json")) {
+    throw new Error(await res.text());
   }
 
   return res.json();
 }
 
 export async function fetchTopStockAlerts(storeId: string) {
-  const res = await fetch(
-    `${API_BASE}/api/analytics/top-stock-alerts/${storeId}`,
-    {
-      headers: {
-        "ngrok-skip-browser-warning": "true",
-      },
-    }
-  );
+  const url =
+    `${API_BASE}/api/analytics/top-stock-alerts/${storeId}` +
+    `?ngrok-skip-browser-warning=true`;
 
-  const contentType = res.headers.get("content-type") || "";
-  if (!contentType.includes("application/json")) {
-    const text = await res.text();
-    throw new Error("Expected JSON, got:\n" + text.slice(0, 200));
+  const res = await fetch(url);
+
+  const ct = res.headers.get("content-type") || "";
+  if (!ct.includes("application/json")) {
+    throw new Error(await res.text());
   }
 
   return res.json();
 }
 
 export async function fetchQuickAnalysis(storeId: string) {
-  const res = await fetch(
-    `${API_BASE}/api/analytics/quick-analysis/${storeId}`,
-    {
-      headers: {
-        "ngrok-skip-browser-warning": "true",
-      },
-    }
-  );
+  const url =
+    `${API_BASE}/api/analytics/quick-analysis/${storeId}` +
+    `?ngrok-skip-browser-warning=true`;
 
-  const contentType = res.headers.get("content-type") || "";
-  if (!contentType.includes("application/json")) {
-    const text = await res.text();
-    throw new Error("Expected JSON, got:\n" + text.slice(0, 200));
+  const res = await fetch(url);
+
+  const ct = res.headers.get("content-type") || "";
+  if (!ct.includes("application/json")) {
+    throw new Error(await res.text());
   }
 
   return res.json();
@@ -195,19 +159,15 @@ export async function fetchQuickAnalysis(storeId: string) {
 
 export async function fetchMonthlyRevenue(storeId: string, params = {}) {
   const queryParams = buildQueryParams(params);
-  const res = await fetch(
-    `${API_BASE}/api/analytics/monthly-revenue/${storeId}?${queryParams}`,
-    {
-      headers: {
-        "ngrok-skip-browser-warning": "true",
-      },
-    }
-  );
+  const url =
+    `${API_BASE}/api/analytics/monthly-revenue/${storeId}` +
+    `?${queryParams}&ngrok-skip-browser-warning=true`;
 
-  const contentType = res.headers.get("content-type") || "";
-  if (!contentType.includes("application/json")) {
-    const text = await res.text();
-    throw new Error("Expected JSON, got:\n" + text.slice(0, 200));
+  const res = await fetch(url);
+
+  const ct = res.headers.get("content-type") || "";
+  if (!ct.includes("application/json")) {
+    throw new Error(await res.text());
   }
 
   return res.json();
@@ -215,19 +175,15 @@ export async function fetchMonthlyRevenue(storeId: string, params = {}) {
 
 export async function fetchProductsByCategory(storeId: string, params = {}) {
   const queryParams = buildQueryParams(params);
-  const res = await fetch(
-    `${API_BASE}/api/analytics/products-by-category/${storeId}?${queryParams}`,
-    {
-      headers: {
-        "ngrok-skip-browser-warning": "true",
-      },
-    }
-  );
+  const url =
+    `${API_BASE}/api/analytics/products-by-category/${storeId}` +
+    `?${queryParams}&ngrok-skip-browser-warning=true`;
 
-  const contentType = res.headers.get("content-type") || "";
-  if (!contentType.includes("application/json")) {
-    const text = await res.text();
-    throw new Error("Expected JSON, got:\n" + text.slice(0, 200));
+  const res = await fetch(url);
+
+  const ct = res.headers.get("content-type") || "";
+  if (!ct.includes("application/json")) {
+    throw new Error(await res.text());
   }
 
   return res.json();
@@ -235,38 +191,30 @@ export async function fetchProductsByCategory(storeId: string, params = {}) {
 
 export async function fetchRecentOrders(storeId: string, query = {}) {
   const params = buildQueryParams(query);
-  const res = await fetch(
-    `${API_BASE}/api/analytics/recent-orders/${storeId}?${params}`,
-    {
-      headers: {
-        "ngrok-skip-browser-warning": "true",
-      },
-    }
-  );
+  const url =
+    `${API_BASE}/api/analytics/recent-orders/${storeId}` +
+    `?${params}&ngrok-skip-browser-warning=true`;
 
-  const contentType = res.headers.get("content-type") || "";
-  if (!contentType.includes("application/json")) {
-    const text = await res.text();
-    throw new Error("Expected JSON, got:\n" + text.slice(0, 200));
+  const res = await fetch(url);
+
+  const ct = res.headers.get("content-type") || "";
+  if (!ct.includes("application/json")) {
+    throw new Error(await res.text());
   }
 
   return res.json();
 }
 
 export async function fetchTopDishSearches(storeId: string) {
-  const res = await fetch(
-    `${API_BASE}/api/analytics/top-dish-searches/${storeId}`,
-    {
-      headers: {
-        "ngrok-skip-browser-warning": "true",
-      },
-    }
-  );
+  const url =
+    `${API_BASE}/api/analytics/top-dish-searches/${storeId}` +
+    `?ngrok-skip-browser-warning=true`;
 
-  const contentType = res.headers.get("content-type") || "";
-  if (!contentType.includes("application/json")) {
-    const text = await res.text();
-    throw new Error("Expected JSON, got:\n" + text.slice(0, 200));
+  const res = await fetch(url);
+
+  const ct = res.headers.get("content-type") || "";
+  if (!ct.includes("application/json")) {
+    throw new Error(await res.text());
   }
 
   return res.json();
@@ -274,19 +222,15 @@ export async function fetchTopDishSearches(storeId: string) {
 
 export async function fetchTopSellingProducts(storeId: string, params = {}) {
   const queryParams = buildQueryParams(params);
-  const res = await fetch(
-    `${API_BASE}/api/analytics/top-selling-products/${storeId}?${queryParams}`,
-    {
-      headers: {
-        "ngrok-skip-browser-warning": "true",
-      },
-    }
-  );
+  const url =
+    `${API_BASE}/api/analytics/top-selling-products/${storeId}` +
+    `?${queryParams}&ngrok-skip-browser-warning=true`;
 
-  const contentType = res.headers.get("content-type") || "";
-  if (!contentType.includes("application/json")) {
-    const text = await res.text();
-    throw new Error("Expected JSON, got:\n" + text.slice(0, 200));
+  const res = await fetch(url);
+
+  const ct = res.headers.get("content-type") || "";
+  if (!ct.includes("application/json")) {
+    throw new Error(await res.text());
   }
 
   return res.json();
