@@ -86,7 +86,7 @@ export async function fetchRecentOrders(storeId: string, query = {}) {
 }
 
 export async function fetchTopDishSearches(storeId: string) {
-  const res = await fetch(`${API_BASE}/api/analytics/Top_Dish_Searches/${storeId}`);
+  const res = await fetch(`${API_BASE}/api/analytics/top-dish-searches/${storeId}`);
   return res.json();
 }
 

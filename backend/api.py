@@ -1050,7 +1050,7 @@ def get_recent_orders(
 
 #-------------------------------------------------- Supabase DATA FETCHING --------------------------------------------------------------------
 
-@router.get("/api/analytics/Top_Dish_Searches/{store_id}", tags=["Analytics"])
+@router.get("/api/analytics/top-dish-searches/{store_id}", tags=["Analytics"])
 def get_top_dish_searches(store_id: str):
     try:
         raw_resp = (
@@ -1486,6 +1486,9 @@ def get_low_stock_products(
         logger.exception(f"Failed to get low-stock products for store {store_id}")
         raise Exception(f"Failed to fetch low-stock products: {str(e)}")
 
+@router.get("/", tags=["Health"])
+def health():
+    return {"status": "ok"}
 
 @router.get("/api/analytics/quick-analysis/{store_id}", tags=["AI Analytics"])
 def get_product_substitutes_for_low_stock(
