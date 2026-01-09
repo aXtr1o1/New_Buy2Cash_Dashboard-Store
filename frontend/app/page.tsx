@@ -919,7 +919,7 @@ export default function Buy2CashDashboard() {
           {/* Customer Management */}
           <div className="mb-6">
             <h2 className="text-lg font-semibold mb-4 text-black">Customer Management</h2>
-            <div className="grid grid-cols-3 gap-4 mb-6">
+            <div className="grid grid-cols-4 gap-4 mb-6">
               <div className="bg-white p-4 rounded-lg border border-gray-200">
                 <div className="text-xs text-gray-500 mb-1">TOTAL CUSTOMERS</div>
                 {dashboardData.loading ? (
@@ -946,6 +946,15 @@ export default function Buy2CashDashboard() {
                   <div className="h-8 bg-gray-200 rounded animate-pulse mb-1"></div>
                 ) : (
                   <div className="text-2xl font-bold text-[#4A3F8F] mb-1">{formatCurrency(dashboardData.topCustomers!)}</div>
+                )}
+                
+              </div>
+              <div className="bg-white p-4 rounded-lg border border-gray-200">
+                <div className="text-xs text-gray-500 mb-1">TOP CUSTOMER NAME</div>
+                {dashboardData.loading ? (
+                  <div className="h-8 bg-gray-200 rounded animate-pulse mb-1"></div>
+                ) : (
+                  <div className="text-2xl font-bold text-[#4A3F8F] mb-1">{dashboardData.topCustomersName}</div>
                 )}
                 
               </div>

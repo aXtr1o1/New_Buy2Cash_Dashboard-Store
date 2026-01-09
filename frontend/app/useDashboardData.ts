@@ -31,6 +31,7 @@ export const useDashboardData = () => {
   const [totalCustomers, setTotalCustomers] = useState<number | null>(null);
   const [uniqueCustomers, setUniqueCustomers] = useState<number | null>(null);
   const [topCustomers, setTopCustomers] = useState<number | null>(null);
+  const [topCustomersName, setTopCustomersName] = useState<string | null>(null);
   
   // AI-Powered Analysis State
   const [aiRecommendations, setAiRecommendations] = useState<any[]>([]);
@@ -80,6 +81,8 @@ export const useDashboardData = () => {
 
   // Filter States (applied filters)
   const [filterStatus, setFilterStatus] = useState('');
+  const [productStatus, setProductStatus] = useState('');
+  const [orderStatus, setOrderStatus] = useState('');
   const [searchText, setSearchText] = useState('');
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
@@ -87,6 +90,8 @@ export const useDashboardData = () => {
   
   // Pending Filter States (temporary, not yet applied)
   const [pendingFilterStatus, setPendingFilterStatus] = useState('');
+  const [pendingProductStatus, setPendingProductStatus] = useState('');
+  const [pendingOrderStatus, setPendingOrderStatus] = useState('');
   const [pendingSearchText, setPendingSearchText] = useState('');
   const [pendingDateFrom, setPendingDateFrom] = useState('');
   const [pendingDateTo, setPendingDateTo] = useState('');
@@ -134,6 +139,7 @@ export const useDashboardData = () => {
         setTotalCustomers(customersData.total_customers || 0);
         setUniqueCustomers(uniqueCustomersData.unique_customers || 0);
         setTopCustomers(topCustomersData.top_customer?.total_spent || 0);
+        setTopCustomersName(topCustomersData.top_customer?.customerName || '');
 
       } catch (err) {
         console.error('Error fetching KPIs:', err);
@@ -361,6 +367,8 @@ export const useDashboardData = () => {
 
   const applyFilters = () => {
     setFilterStatus(pendingFilterStatus);
+    setProductStatus(pendingProductStatus);
+    setOrderStatus(pendingOrderStatus);
     setSearchText(pendingSearchText);
     setDateFrom(pendingDateFrom);
     setDateTo(pendingDateTo);
@@ -390,6 +398,7 @@ export const useDashboardData = () => {
     totalCustomers,
     uniqueCustomers,
     topCustomers,
+    topCustomersName,
     
     // Chart data
     monthlyRevenue,
@@ -427,6 +436,10 @@ export const useDashboardData = () => {
     // Pending Filters
     pendingFilterStatus,
     setPendingFilterStatus,
+    pendingProductStatus,
+    setPendingProductStatus,
+    pendingOrderStatus,
+    setPendingOrderStatus,
     pendingSearchText,
     setPendingSearchText,
     pendingDateFrom,

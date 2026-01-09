@@ -729,16 +729,18 @@ def get_products_by_category(
     store_id: str,
     date_from: str = Query(None),
     date_to: str = Query(None),
-    status: str = Query("APPROVED", description="Product status filter"),
+    status: str = Query(None, description="Order status filter"),
     category_id: str = Query(None, description="Filter by specific category")
 ):
     try:
         store_obj_id = ObjectId(store_id)
         
         match_stage = {
-            "seller": store_obj_id,
-            "status": status
+            "seller": store_obj_id
         }
+        
+        if status:
+            match_stage["status"] = status
         
         if date_from or date_to:
             date_filter = {}
@@ -750,14 +752,29 @@ def get_products_by_category(
         
         # Add category filter if provided
         if category_id:
-            match_stage["category"] = ObjectId(category_id)
+            product_ids = db.products.find(
+                {"category": ObjectId(category_id)},
+                {"_id": 1}
+            )
+            product_id_list = [product["_id"] for product in product_ids]
+            match_stage["items._id"] = {"$in": product_id_list}
 
         pipeline = [
             {"$match": match_stage},
+            {"$unwind": "$items"},
+            {
+                "$lookup": {
+                    "from": "products",
+                    "localField": "items._id",
+                    "foreignField": "_id",
+                    "as": "product_info"
+                }
+            },
+            {"$unwind": "$product_info"},
             {
                 "$lookup": {
                     "from": "categories",
-                    "localField": "category",
+                    "localField": "product_info.category",
                     "foreignField": "_id",
                     "as": "category_info"
                 }
@@ -765,27 +782,30 @@ def get_products_by_category(
             {"$unwind": "$category_info"},
             {
                 "$group": {
-                    "_id": "$category",
+                    "_id": "$product_info.category",
                     "category_name": {"$first": "$category_info.name"},
-                    "product_count": {"$sum": 1},
-                    "total_stock_value": {
-                        "$sum": {"$multiply": ["$offerPrice", 1]}
-                    }
+                    "product_count": {"$addToSet": "$items._id"},
+                    "order_count": {"$sum": 1},
+                    "total_revenue": {"$sum": "$items.subTotal"},
+                    "total_quantity": {"$sum": "$items.quantity"}
                 }
             },
-            {"$sort": {"product_count": -1}},
             {
                 "$project": {
                     "_id": 0,
                     "category_id": {"$toString": "$_id"},
                     "category_name": 1,
-                    "product_count": 1,
-                    "total_stock_value": {"$round": ["$total_stock_value", 2]}
+                    "product_count": {"$size": "$product_count"},
+                    "order_count": 1,
+                    "total_revenue": {"$round": ["$total_revenue", 2]},
+                    "total_stock_value": {"$round": ["$total_revenue", 2]},
+                    "total_quantity": 1
                 }
-            }
+            },
+            {"$sort": {"order_count": -1}}
         ]
 
-        result = list(db.products.aggregate(pipeline))
+        result = list(db.orders.aggregate(pipeline))
 
         return {
             "store_id": store_id,
@@ -802,6 +822,8 @@ def get_products_by_category(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to fetch category distribution: {str(e)}")
 
+        
+
 @router.get("/api/analytics/top-selling-products/{store_id}", tags=["Analytics"])
 def get_top_selling_products(
     store_id: str,
@@ -816,8 +838,8 @@ def get_top_selling_products(
         match_conditions = {"seller": store_obj_id}
         if status:
             match_conditions["status"] = status
-        else:
-            match_conditions["status"] = "COMPLETED"
+        # else:
+        #     match_conditions["status"] = "COMPLETED"
         if date_from or date_to:
             date_filter = {}
             if date_from:
