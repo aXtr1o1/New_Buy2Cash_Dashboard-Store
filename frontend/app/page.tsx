@@ -28,16 +28,66 @@ export default function Buy2CashDashboard() {
   const getChartData = () => {
     const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     
-    const chartData = monthNames.map((name, idx) => ({
-      month: name,
-      revenue: 0,
-      index: idx + 1
+    // Check if date filters are applied
+    const dateFrom = dashboardData.dateFrom;
+    const dateTo = dashboardData.dateTo;
+    
+    let monthsToShow: Array<{month: number, year: number, monthName: string}> = [];
+    
+    if (dateFrom && dateTo) {
+      // Both dates provided - calculate months between them
+      const fromDate = new Date(dateFrom);
+      const toDate = new Date(dateTo);
+      
+      // Check if it's exactly 2 months
+      const fromYear = fromDate.getFullYear();
+      const fromMonth = fromDate.getMonth() + 1; // getMonth() returns 0-11
+      const toYear = toDate.getFullYear();
+      const toMonth = toDate.getMonth() + 1;
+      
+      // Generate months in range
+      let currentDate = new Date(fromYear, fromMonth - 1, 1);
+      const endDate = new Date(toYear, toMonth - 1, 1);
+      
+      while (currentDate <= endDate) {
+        monthsToShow.push({
+          month: currentDate.getMonth() + 1,
+          year: currentDate.getFullYear(),
+          monthName: monthNames[currentDate.getMonth()]
+        });
+        currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1);
+      }
+    } else {
+      // No date filter - show past 12 months from current month
+      const today = new Date();
+      const currentYear = today.getFullYear();
+      const currentMonth = today.getMonth() + 1;
+      
+      for (let i = 11; i >= 0; i--) {
+        const date = new Date(currentYear, currentMonth - 1 - i, 1);
+        monthsToShow.push({
+          month: date.getMonth() + 1,
+          year: date.getFullYear(),
+          monthName: monthNames[date.getMonth()]
+        });
+      }
+    }
+    
+    // Create chart data structure with all months in range
+    const chartData = monthsToShow.map((m) => ({
+      month: m.monthName,
+      year: m.year,
+      monthNum: m.month,
+      revenue: 0
     }));
-
+    
+    // Fill in revenue data from API response
     dashboardData.monthlyRevenue.forEach((item: any) => {
-      const monthIndex = item.month - 1;
-      if (monthIndex >= 0 && monthIndex < 12) {
-        chartData[monthIndex].revenue = item.total_revenue;
+      const matchingIndex = chartData.findIndex(
+        d => d.monthNum === item.month && d.year === item.year
+      );
+      if (matchingIndex !== -1) {
+        chartData[matchingIndex].revenue = item.total_revenue;
       }
     });
 
@@ -49,7 +99,26 @@ export default function Buy2CashDashboard() {
     : 1;
   
   const chartData = getChartData();
-  const maxRevenue = Math.max(...chartData.map(d => d.revenue), 1);
+  
+  // Helper function to round UP to nice whole numbers for Y-axis (e.g., 6844 -> 7000, 5133 -> 6000)
+  const roundToNiceNumber = (value: number): number => {
+    if (value === 0) return 0;
+    
+    // Determine the appropriate increment based on value size
+    let increment: number;
+    if (value < 100) increment = 10;
+    else if (value < 1000) increment = 100;
+    else if (value < 10000) increment = 1000;
+    else if (value < 100000) increment = 10000;
+    else if (value < 1000000) increment = 100000;
+    else increment = 1000000;
+    
+    // Round up to next increment
+    return Math.ceil(value / increment) * increment;
+  };
+  
+  const rawMaxRevenue = Math.max(...chartData.map(d => d.revenue), 1);
+  const maxRevenue = roundToNiceNumber(rawMaxRevenue);
 
   const getDonutSegments = () => {
     if (dashboardData.categoryDistribution.length === 0) return [];
@@ -135,8 +204,7 @@ export default function Buy2CashDashboard() {
             </div>
             <Bell className="w-5 h-5 text-gray-400" />
             <div className="flex items-center space-x-2">
-              <span className="text-sm font-medium">HR Store</span>
-              <ChevronDown className="w-4 h-4 text-gray-400" />
+              <span className="text-sm font-medium text-black">{dashboardData.storeName}</span>
             </div>
           </div>
         </header>
@@ -220,13 +288,17 @@ export default function Buy2CashDashboard() {
               onChange={(e) => dashboardData.setPendingFilterStatus(e.target.value)}
             >
               <option value="">All Status</option>
+              <option value="ABANDONED">Abandoned</option>
+              <option value="ASSIGNED">Assigned</option>
               <option value="COMPLETED">Completed</option>
-              <option value="PENDING">Pending</option>
-              <option value="ACCEPTED">Accepted</option>
-              <option value="IN_DELIVERY">In Delivery</option>
-              <option value="PICKED_UP">Picked Up</option>
-              <option value="CANCELLED">Cancelled</option>
+              <option value="CURRENT">Current</option>
               <option value="EXPIRED">Expired</option>
+              <option value="INTRANSIT">In Transit</option>
+              <option value="PACKED">Packed</option>
+              <option value="PENDING">Pending</option>
+              <option value="PLACED">Placed</option>
+              <option value="PRICEPENDING">Price Pending</option>
+              <option value="REJECTED">Rejected</option>
             </select>
             <input 
               type="text" 
@@ -505,143 +577,148 @@ export default function Buy2CashDashboard() {
                   <div className="relative">
                     <div className="h-64 relative" style={{ background: 'linear-gradient(180deg, rgba(99, 102, 241, 0.05) 0%, rgba(99, 102, 241, 0.02) 100%)' }}>
                       <div className="absolute left-0 top-0 bottom-0 w-16 flex flex-col justify-between text-xs text-gray-500 pr-2">
-                        <span>₹{Math.round(maxRevenue)}</span>
-                        <span>₹{Math.round(maxRevenue * 0.75)}</span>
-                        <span>₹{Math.round(maxRevenue * 0.5)}</span>
-                        <span>₹{Math.round(maxRevenue * 0.25)}</span>
+                        <span>₹{Math.round(maxRevenue).toLocaleString()}</span>
+                        <span>₹{Math.round(maxRevenue * 0.75).toLocaleString()}</span>
+                        <span>₹{Math.round(maxRevenue * 0.5).toLocaleString()}</span>
+                        <span>₹{Math.round(maxRevenue * 0.25).toLocaleString()}</span>
                         <span>₹0</span>
                       </div>
                       
-                      <svg className="w-full h-full pl-16 pr-4" viewBox="-10 0 840 300" preserveAspectRatio="none" style={{ overflow: 'visible' }}>
-                        {[0, 0.25, 0.5, 0.75, 1].map((pct, i) => (
-                          <line
-                            key={i}
-                            x1="0"
-                            y1={256 * (1 - pct) + 22}
-                            x2="800"
-                            y2={256 * (1 - pct) + 22}
-                            stroke="#E5E7EB"
-                            strokeWidth="1"
-                          />
-                        ))}
-                        
-                        <defs>
-                          <linearGradient id="areaGradient" x1="0" x2="0" y1="0" y2="1">
-                            <stop offset="0%" stopColor="#6366F1" stopOpacity="0.15"/>
-                            <stop offset="100%" stopColor="#6366F1" stopOpacity="0.01"/>
-                          </linearGradient>
-                        </defs>
-                        
-                        <path
-                          d={`M 0 ${278} ${chartData.map((d, i) => {
-                            const x = (i / (chartData.length - 1)) * 800;
-                            const y = 278 - ((d.revenue / maxRevenue) * 240);
-                            return `L ${x} ${y}`;
-                          }).join(' ')} L 800 ${278} Z`}
-                          fill="url(#areaGradient)"
-                        />
-                        
-                        <path
-                          d={chartData.map((d, i) => {
-                            const x = (i / (chartData.length - 1)) * 800;
-                            const y = 278 - ((d.revenue / maxRevenue) * 240);
-                            return `${i === 0 ? 'M' : 'L'} ${x} ${y}`;
-                          }).join(' ')}
-                          fill="none"
-                          stroke="#6366F1"
-                          strokeWidth="3"
-                        />
-                        
-                        {chartData.map((d, i) => {
-                          const x = (i / (chartData.length - 1)) * 800;
-                          const y = 278 - ((d.revenue / maxRevenue) * 240);
-                          
-                          // Position tooltip above the point
-                          const tooltipY = Math.max(y - 48, 5);
-                          
-                          // Center tooltip on point, but adjust for edges
-                          let tooltipX = x - 50;
-                          if (x < 50) {
-                            // Near left edge - align left
-                            tooltipX = 0;
-                          } else if (x > 750) {
-                            // Near right edge - align right
-                            tooltipX = 700;
-                          }
-                          
-                          // Center point for text (middle of 100px tooltip)
-                          const textX = tooltipX + 50;
-                          
-                          return (
-                            <g key={i}>
-                              <circle
-                                cx={x}
-                                cy={y}
-                                r="25"
-                                fill="transparent"
-                                onMouseEnter={() => setHoveredPoint(i)}
-                                onMouseLeave={() => setHoveredPoint(null)}
-                                style={{ cursor: 'pointer' }}
+                      {chartData.length > 0 && (() => {
+                        const svgWidth = Math.max(800, Math.max(chartData.length, 2) * 70);
+                        return (
+                          <svg className="w-full h-full pl-16 pr-4" viewBox={`-10 0 ${svgWidth} 300`} preserveAspectRatio="none" style={{ overflow: 'visible' }}>
+                            {[0, 0.25, 0.5, 0.75, 1].map((pct, i) => (
+                              <line
+                                key={i}
+                                x1="0"
+                                y1={256 * (1 - pct) + 22}
+                                x2={svgWidth}
+                                y2={256 * (1 - pct) + 22}
+                                stroke="#E5E7EB"
+                                strokeWidth="1"
                               />
-                              <circle
-                                cx={x}
-                                cy={y}
-                                r="6"
-                                fill="#6366F1"
-                                stroke="white"
-                                strokeWidth="3"
-                                style={{ pointerEvents: 'none' }}
-                              />
-                              {hoveredPoint === i && (
-                                <g style={{ pointerEvents: 'none' }}>
-                                  <rect
-                                    x={tooltipX}
-                                    y={tooltipY}
-                                    width="100"
-                                    height="38"
-                                    fill="white"
-                                    stroke="#6366F1"
-                                    strokeWidth="2"
-                                    rx="6"
-                                    filter="url(#shadow)"
-                                  />
-                                  <text
-                                    x={textX}
-                                    y={tooltipY + 16}
-                                    textAnchor="middle"
-                                    fontSize="13"
-                                    fill="#6366F1"
-                                    fontWeight="700"
-                                  >
-                                    {d.month}
-                                  </text>
-                                  <text
-                                    x={textX}
-                                    y={tooltipY + 31}
-                                    textAnchor="middle"
-                                    fontSize="12"
-                                    fill="#374151"
-                                    fontWeight="600"
-                                  >
-                                    {formatCurrency(d.revenue)}
-                                  </text>
-                                </g>
-                              )}
-                            </g>
-                          );
-                        })}
-                        
-                        <defs>
-                          <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
-                            <feDropShadow dx="0" dy="2" stdDeviation="4" floodOpacity="0.2"/>
-                          </filter>
-                        </defs>
-                      </svg>
+                            ))}
+                            
+                            <defs>
+                              <linearGradient id="areaGradient" x1="0" x2="0" y1="0" y2="1">
+                                <stop offset="0%" stopColor="#6366F1" stopOpacity="0.15"/>
+                                <stop offset="100%" stopColor="#6366F1" stopOpacity="0.01"/>
+                              </linearGradient>
+                            </defs>
+                            
+                            <path
+                              d={`M 0 ${278} ${chartData.map((d, i) => {
+                                const x = chartData.length > 1 ? (i / (chartData.length - 1)) * svgWidth : svgWidth / 2;
+                                const y = maxRevenue > 0 ? 278 - ((d.revenue / maxRevenue) * 240) : 278;
+                                return `L ${x} ${y}`;
+                              }).join(' ')} L ${svgWidth} ${278} Z`}
+                              fill="url(#areaGradient)"
+                            />
+                            
+                            <path
+                              d={chartData.map((d, i) => {
+                                const x = chartData.length > 1 ? (i / (chartData.length - 1)) * svgWidth : svgWidth / 2;
+                                const y = maxRevenue > 0 ? 278 - ((d.revenue / maxRevenue) * 240) : 278;
+                                return `${i === 0 ? 'M' : 'L'} ${x} ${y}`;
+                              }).join(' ')}
+                              fill="none"
+                              stroke="#6366F1"
+                              strokeWidth="3"
+                            />
+                            
+                            {chartData.map((d, i) => {
+                              const x = chartData.length > 1 ? (i / (chartData.length - 1)) * svgWidth : svgWidth / 2;
+                              const y = maxRevenue > 0 ? 278 - ((d.revenue / maxRevenue) * 240) : 278;
+                            
+                            // Position tooltip above the point
+                            const tooltipY = Math.max(y - 48, 5);
+                            
+                            // Center tooltip on point, but adjust for edges
+                            let tooltipX = x - 50;
+                            if (x < 50) {
+                              tooltipX = 0;
+                            } else if (x > svgWidth - 50) {
+                              tooltipX = svgWidth - 100;
+                            }
+                            
+                            const textX = tooltipX + 50;
+                            
+                            return (
+                              <g key={i}>
+                                <circle
+                                  cx={x}
+                                  cy={y}
+                                  r="25"
+                                  fill="transparent"
+                                  onMouseEnter={() => setHoveredPoint(i)}
+                                  onMouseLeave={() => setHoveredPoint(null)}
+                                  style={{ cursor: 'pointer' }}
+                                />
+                                <circle
+                                  cx={x}
+                                  cy={y}
+                                  r="6"
+                                  fill="#6366F1"
+                                  stroke="white"
+                                  strokeWidth="3"
+                                  style={{ pointerEvents: 'none' }}
+                                />
+                                {hoveredPoint === i && (
+                                  <g style={{ pointerEvents: 'none' }}>
+                                    <rect
+                                      x={tooltipX}
+                                      y={tooltipY}
+                                      width="100"
+                                      height="38"
+                                      fill="white"
+                                      stroke="#6366F1"
+                                      strokeWidth="2"
+                                      rx="6"
+                                      filter="url(#shadow)"
+                                    />
+                                    <text
+                                      x={textX}
+                                      y={tooltipY + 16}
+                                      textAnchor="middle"
+                                      fontSize="13"
+                                      fill="#6366F1"
+                                      fontWeight="700"
+                                    >
+                                      {d.month} {d.year}
+                                    </text>
+                                    <text
+                                      x={textX}
+                                      y={tooltipY + 31}
+                                      textAnchor="middle"
+                                      fontSize="12"
+                                      fill="#374151"
+                                      fontWeight="600"
+                                    >
+                                      {formatCurrency(d.revenue)}
+                                    </text>
+                                  </g>
+                                )}
+                              </g>
+                            );
+                          })}
+                          
+                          <defs>
+                            <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+                              <feDropShadow dx="0" dy="2" stdDeviation="4" floodOpacity="0.2"/>
+                            </filter>
+                          </defs>
+                          </svg>
+                        );
+                      })()}
                     </div>
                     
                     <div className="flex justify-between text-xs text-gray-500 mt-2 pl-16 pr-4">
                       {chartData.map((d, i) => (
-                        <span key={i}>{d.month}</span>
+                        <div key={i} className="flex flex-col items-center">
+                          <span className="font-medium">{d.month}</span>
+                          <span className="text-xs text-gray-400">{d.year}</span>
+                        </div>
                       ))}
                     </div>
                   </div>
@@ -783,13 +860,13 @@ export default function Buy2CashDashboard() {
                   <div className="space-y-3">
                     {dashboardData.top10Products.map((product: any, idx: number) => (
                       <div key={idx} className="flex items-center space-x-3">
-                        <div className="w-24 text-xs text-gray-600 text-right truncate" title={product.product_name}>
-                          {product.product_name.length > 12 ? product.product_name.substring(0, 12) + '...' : product.product_name}
+                        <div className="w-40 text-xs text-gray-600 text-right pr-2" title={product.product_name}>
+                          <span className="break-words">{product.product_name}</span>
                         </div>
                         <div className="flex-1 relative">
-                          <div className="w-full bg-gray-200 rounded-full h-6">
+                          <div className="w-full bg-gray-200 rounded-full h-4">
                             <div 
-                              className="bg-[#4A3F8F] h-6 rounded-full flex items-center justify-end pr-2 transition-all duration-300"
+                              className="bg-[#4A3F8F] h-4 rounded-full flex items-center justify-end pr-2 transition-all duration-300"
                               style={{ width: `${(product.total_quantity_sold / maxProductQuantity) * 100}%` }}
                             >
                               <span className="text-xs font-medium text-white">
@@ -941,20 +1018,21 @@ export default function Buy2CashDashboard() {
               </div>
 
               <div className="bg-white p-4 rounded-lg border border-gray-200">
+                <div className="text-xs text-gray-500 mb-1">TOP CUSTOMER NAME</div>
+                {dashboardData.loading ? (
+                  <div className="h-8 bg-gray-200 rounded animate-pulse mb-1"></div>
+                ) : (
+                  <div className="text-xl font-bold text-[#4A3F8F] mb-1">{dashboardData.topCustomersName}</div>
+                )}
+                
+              </div>
+
+              <div className="bg-white p-4 rounded-lg border border-gray-200">
                 <div className="text-xs text-gray-500 mb-1">TOP CUSTOMER SPEND</div>
                 {dashboardData.loading ? (
                   <div className="h-8 bg-gray-200 rounded animate-pulse mb-1"></div>
                 ) : (
                   <div className="text-2xl font-bold text-[#4A3F8F] mb-1">{formatCurrency(dashboardData.topCustomers!)}</div>
-                )}
-                
-              </div>
-              <div className="bg-white p-4 rounded-lg border border-gray-200">
-                <div className="text-xs text-gray-500 mb-1">TOP CUSTOMER NAME</div>
-                {dashboardData.loading ? (
-                  <div className="h-8 bg-gray-200 rounded animate-pulse mb-1"></div>
-                ) : (
-                  <div className="text-2xl font-bold text-[#4A3F8F] mb-1">{dashboardData.topCustomersName}</div>
                 )}
                 
               </div>
@@ -1128,7 +1206,9 @@ export default function Buy2CashDashboard() {
                           {idx + 1}
                         </div>
                         <div>
-                          <div className="font-bold text-sm text-black">{dish.name}</div>
+                          <div className="font-bold text-sm text-black">
+                            {dish.name ? dish.name.charAt(0).toUpperCase() + dish.name.slice(1) : ''}
+                          </div>
                           <div className="text-xs text-gray-500">Popular dish</div>
                         </div>
                       </div>

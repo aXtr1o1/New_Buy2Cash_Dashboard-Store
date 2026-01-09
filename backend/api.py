@@ -9,7 +9,22 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 router = APIRouter()
 
-
+#--------------------------------------------------Header Api endpoints ----------------------------------------------
+@router.get("/api/analytics/store-name/{store_id}", tags=["Headers"])
+def get_header(
+    store_id: str
+):
+    try:
+        store_name=db.sellers.find_one(
+            {"_id": ObjectId(store_id)},
+            {"storeName": 1}
+        )
+        return {
+            "store_id": store_id,
+            "store_name": store_name.get("storeName", "Unknown")
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch header: {str(e)}")
 
 #-------------------------------------------------- ALL KPIS CARD ENDPOINTS ------------------------
 
@@ -18,7 +33,7 @@ router = APIRouter()
 
 from bson import ObjectId
 from database import db , supabase_client 
-@router.get("/api/analytics/total-products/{store_id}", tags=["Analytics"])
+@router.get("/api/analytics/total-products/{store_id}", tags=["KPIS Cards"])
 def get_product_count(
     store_id: str,
     date_from: str = Query(None),
@@ -34,8 +49,8 @@ def get_product_count(
             "seller": ObjectId(store_id)
         }
 
-        if status:
-            match_stage["status"] = status
+        # if status:
+        #     match_stage["status"] = status
 
         if date_from or date_to:
             date_filter = {}
@@ -73,7 +88,7 @@ def get_product_count(
 
 
 
-@router.get("/api/analytics/total-sales/{store_id}", tags=["Analytics"])
+@router.get("/api/analytics/total-sales/{store_id}", tags=["KPIS Cards"])
 def get_total_sales(
     store_id: str,
     date_from: str = Query(None),
@@ -127,7 +142,7 @@ def get_total_sales(
         raise HTTPException(status_code=500, detail=f"Failed to fetch sales counts: {str(e)}")
 
 
-@router.get("/api/analytics/total-revenue/{store_id}", tags=["Analytics"])
+@router.get("/api/analytics/total-revenue/{store_id}", tags=["KPIS Cards"])
 def get_total_revenue(
     store_id: str,
     date_from: str = Query(None),
@@ -193,7 +208,7 @@ def get_total_revenue(
 DEFAULT_MONTHS_WINDOW_DAYS = 365  # last 12 months
 
 
-@router.get("/api/analytics/avg-order-value/{store_id}", tags=["Analytics"])
+@router.get("/api/analytics/avg-order-value/{store_id}", tags=["KPIS Cards"])
 def get_avg_order_value(
     store_id: str,
     date_from: str = Query(None),
@@ -256,7 +271,7 @@ def get_avg_order_value(
         raise HTTPException(status_code=500, detail=f"Failed to fetch avg order value: {str(e)}")
 
 
-@router.get("/api/analytics/avg-sales-per-month/{store_id}", tags=["Analytics"])
+@router.get("/api/analytics/avg-sales-per-month/{store_id}", tags=["KPIS Cards"])
 def get_avg_sales_per_month(
     store_id: str,
     date_from: str = Query(None),
@@ -352,7 +367,7 @@ def get_avg_sales_per_month(
 
 
 
-@router.get("/api/analytics/total-customers/{store_id}", tags=["Analytics"])
+@router.get("/api/analytics/total-customers/{store_id}", tags=["KPIS Cards"])
 def get_total_customers(
     store_id: str,
     date_from: str = Query(None),
@@ -402,7 +417,7 @@ def get_total_customers(
         raise HTTPException(500, f"Failed to fetch total customers: {str(e)}")
     
 
-@router.get("/api/analytics/unique-customers/{store_id}", tags=["Analytics"])
+@router.get("/api/analytics/unique-customers/{store_id}", tags=["KPIS Cards"])
 def get_unique_customers(
     store_id: str,
     date_from: str = Query(None),
@@ -475,7 +490,7 @@ def get_unique_customers(
         raise HTTPException(500, f"Failed to fetch unique customers: {str(e)}")
     
 
-@router.get("/api/analytics/top-customers/{store_id}", tags=["Analytics"])
+@router.get("/api/analytics/top-customers/{store_id}", tags=["KPIS Cards"])
 def get_top_customers(
     store_id: str,
     date_from: str = Query(None),

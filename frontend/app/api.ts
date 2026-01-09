@@ -264,6 +264,23 @@ export async function fetchTopSellingProducts(storeId: string, params = {}) {
   return res.json();
 }
 
+export async function fetchStoreName(storeId: string) {
+  const url = `${API_BASE}/api/analytics/store-name/${storeId}`;
+  const res = await fetch(url, {
+    headers: {
+      'ngrok-skip-browser-warning': 'true',
+      'Content-Type': 'application/json'
+    }
+  });
+
+  const ct = res.headers.get("content-type") || "";
+  if (!ct.includes("application/json")) {
+    throw new Error(await res.text());
+  }
+
+  return res.json();
+}
+
 // Helper Functions
 export const aggregateDishSearches = (dishQueryData: any[]) => {
   const dishCounts: Record<string, number> = {};
@@ -383,8 +400,10 @@ export const getDemandLevel = (productCount: number) => {
 };
 
 export const categoryColors = [
-  '#1E1B4B', '#4338CA', '#818CF8','#FDB022', 
-  '#10B981', '#EC4899', '#EF4444', '#14B8A6'
+  '#1E1B4B', '#4338CA', '#818CF8', '#FDB022', 
+  '#10B981', '#EC4899', '#EF4444', '#14B8A6',
+  '#F59E0B', '#8B5CF6', '#06B6D4', '#84CC16',
+  '#F97316', '#6366F1', '#A855F7'
 ];
 
 export { STORE_ID };

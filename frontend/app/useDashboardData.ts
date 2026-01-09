@@ -16,7 +16,8 @@ import {
   fetchTopDishSearches,
   fetchTopSellingProducts,
   fetchTopStockAlerts,
-  fetchQuickAnalysis
+  fetchQuickAnalysis,
+  fetchStoreName
 } from './api';
 
 export const useDashboardData = () => {
@@ -32,6 +33,7 @@ export const useDashboardData = () => {
   const [uniqueCustomers, setUniqueCustomers] = useState<number | null>(null);
   const [topCustomers, setTopCustomers] = useState<number | null>(null);
   const [topCustomersName, setTopCustomersName] = useState<string | null>(null);
+  const [storeName, setStoreName] = useState<string>('HR Store'); // Default fallback
   
   // AI-Powered Analysis State
   const [aiRecommendations, setAiRecommendations] = useState<any[]>([]);
@@ -151,6 +153,21 @@ export const useDashboardData = () => {
 
     fetchAllKPIs();
   }, [filterStatus, dateFrom, dateTo]);
+
+  // Fetch Store Name
+  useEffect(() => {
+    const fetchStore = async () => {
+      try {
+        const data = await fetchStoreName(STORE_ID);
+        setStoreName(data.store_name || 'HR Store');
+      } catch (err) {
+        console.error('Error fetching store name:', err);
+        // Keep default fallback name on error
+      }
+    };
+
+    fetchStore();
+  }, []);
 
   // Fetch Monthly Revenue
   useEffect(() => {
@@ -399,6 +416,7 @@ export const useDashboardData = () => {
     uniqueCustomers,
     topCustomers,
     topCustomersName,
+    storeName,
     
     // Chart data
     monthlyRevenue,
